@@ -1,52 +1,208 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Добавить партнёра</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    .header {
+      background: #1a3a5c;
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .header a.back-btn {
+      background: transparent;
+      color: white;
+      text-decoration: none;
+      padding: 7px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    .header a.back-btn:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .form-wrap {
+      max-width: 680px;
+      margin: 30px auto;
+      background: white;
+      border: 1px solid #ccc;
+      border-top: 3px solid #1a3a5c;
+    }
+
+    .form-title {
+      background: #1a3a5c;
+      color: white;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.3px;
+    }
+
+    .form-body {
+      padding: 20px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .form-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 14px;
+    }
+
+    .form-group.no-mb {
+      margin-bottom: 0;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: bold;
+      color: #1a3a5c;
+      margin-bottom: 5px;
+    }
+
+    label .req {
+      color: #e04040;
+      margin-left: 2px;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      padding: 7px 10px;
+      border: 1px solid #bbb;
+      border-radius: 3px;
+      font-size: 13px;
+      font-family: Arial, sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus {
+      border-color: #1a3a5c;
+    }
+
+    .form-footer {
+      padding: 14px 20px;
+      background: #f0f5fb;
+      border-top: 1px solid #d0d8e0;
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-save {
+      padding: 8px 24px;
+      background: #1a3a5c;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-save:hover { background: #14304f; }
+
+    .btn-cancel {
+      padding: 8px 18px;
+      background: white;
+      color: #555;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      font-size: 13px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-cancel:hover { background: #f0f0f0; }
+  </style>
 </head>
-<body class="bg-light">
-<div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="m-0">Добавить социального партнёра</h3>
-    <a class="btn btn-outline-secondary" href="/">Назад</a>
-  </div>
+<body>
 
-  <form method="post" class="card p-3 shadow-sm">
-    <div class="mb-3">
-      <label class="form-label">Название организации</label>
-      <input class="form-control" name="organization_name" required>
-    </div>
+<div class="header">
+  <h1>Социальные партнёры</h1>
+  <a class="back-btn" href="/">← Назад к списку</a>
+</div>
 
-    <div class="mb-3">
-      <label class="form-label">Тип партнёрства</label>
-      <input class="form-control" name="partnership_type" required placeholder="Практика / Трудоустройство / Проекты">
-    </div>
+<div class="form-wrap">
+  <div class="form-title">Добавление нового социального партнёра</div>
 
-    <div class="mb-3">
-      <label class="form-label">Адрес</label>
-      <input class="form-control" name="address">
-    </div>
+  <form method="POST" action="/add">
+    <div class="form-body">
 
-    <div class="mb-3">
-      <label class="form-label">Контактное лицо</label>
-      <input class="form-control" name="contact_person">
-    </div>
-
-    <div class="row">
-      <div class="col-md-6 mb-3">
-        <label class="form-label">Телефон</label>
-        <input class="form-control" name="phone">
+      <div class="form-group">
+        <label>Название организации <span class="req">*</span></label>
+        <input type="text" name="organization_name" required placeholder="ТОО «Название»">
       </div>
-      <div class="col-md-6 mb-3">
-        <label class="form-label">Email</label>
-        <input class="form-control" name="email" type="email">
+
+      <div class="form-group">
+        <label>ФИО руководителя</label>
+        <input type="text" name="contact_person" placeholder="Директор Иванов И.И.">
       </div>
+
+      <div class="form-group">
+        <label>Место нахождение</label>
+        <input type="text" name="address" placeholder="г. Алматы, ул. Примерная 1">
+      </div>
+
+      <div class="form-group">
+        <label>Специфика</label>
+        <input type="text" name="partnership_type" placeholder="ЭВМ, ИС, ВТ...">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group no-mb">
+          <label>Контакты</label>
+          <input type="text" name="phone" placeholder="8 (727) 000-00-00">
+        </div>
+        <div class="form-group no-mb">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="info@company.kz">
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-top:14px; margin-bottom:0;">
+        <div class="form-group no-mb">
+          <label>Дата заключения меморандума</label>
+          <input type="text" name="memo_date" placeholder="дд.мм.гггг">
+        </div>
+        <div class="form-group no-mb"></div>
+      </div>
+
     </div>
 
-    <button class="btn btn-primary">Сохранить</button>
+    <div class="form-footer">
+      <button class="btn-save" type="submit">Сохранить</button>
+      <a class="btn-cancel" href="/">Отмена</a>
+    </div>
   </form>
 </div>
+
 </body>
 </html>

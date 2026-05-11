@@ -18,6 +18,7 @@ type Partner struct {
 	Phone            string
 	Email            string
 	PartnershipType  string
+	MemoDate         string
 }
 
 type PageData struct {
@@ -52,13 +53,14 @@ func main() {
 func createTable() error {
 	query := `
 	CREATE TABLE IF NOT EXISTS social_partners (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		id               INTEGER PRIMARY KEY AUTOINCREMENT,
 		organization_name TEXT NOT NULL,
-		address TEXT,
-		contact_person TEXT,
-		phone TEXT,
-		email TEXT,
-		partnership_type TEXT NOT NULL
+		address          TEXT,
+		contact_person   TEXT,
+		phone            TEXT,
+		email            TEXT,
+		partnership_type TEXT NOT NULL,
+		memo_date        TEXT
 	);`
 	_, err := db.Exec(query)
 	return err
@@ -66,20 +68,18 @@ func createTable() error {
 
 func listPartners(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
-
 	var rows *sql.Rows
 	var err error
 
 	if q == "" {
-		rows, err = db.Query(`SELECT id, organization_name, address, contact_person, phone, email, partnership_type
-			FROM social_partners ORDER BY id DESC`)
+		rows, err = db.Query(`SELECT id, organization_name, address, contact_person, phone, email, partnership_type, COALESCE(memo_date,'')
+			FROM social_partners ORDER BY id ASC`)
 	} else {
-		rows, err = db.Query(`SELECT id, organization_name, address, contact_person, phone, email, partnership_type
+		rows, err = db.Query(`SELECT id, organization_name, address, contact_person, phone, email, partnership_type, COALESCE(memo_date,'')
 			FROM social_partners
 			WHERE organization_name LIKE ? OR partnership_type LIKE ? OR contact_person LIKE ?
-			ORDER BY id DESC`, "%"+q+"%", "%"+q+"%", "%"+q+"%")
+			ORDER BY id ASC`, "%"+q+"%", "%"+q+"%", "%"+q+"%")
 	}
-
 	if err != nil {
 		http.Error(w, "DB error: "+err.Error(), 500)
 		return
@@ -89,7 +89,8 @@ func listPartners(w http.ResponseWriter, r *http.Request) {
 	var partners []Partner
 	for rows.Next() {
 		var p Partner
-		if err := rows.Scan(&p.ID, &p.OrganizationName, &p.Address, &p.ContactPerson, &p.Phone, &p.Email, &p.PartnershipType); err != nil {
+		if err := rows.Scan(&p.ID, &p.OrganizationName, &p.Address, &p.ContactPerson,
+			&p.Phone, &p.Email, &p.PartnershipType, &p.MemoDate); err != nil {
 			http.Error(w, "Scan error: "+err.Error(), 500)
 			return
 		}
@@ -113,27 +114,24 @@ func addPartner(w http.ResponseWriter, r *http.Request) {
 			ContactPerson:    r.FormValue("contact_person"),
 			Phone:            r.FormValue("phone"),
 			Email:            r.FormValue("email"),
+			MemoDate:         r.FormValue("memo_date"),
 		}
-
-		if p.OrganizationName == "" || p.PartnershipType == "" {
+		if p.OrganizationName == "" {
 			http.Error(w, "Заполните обязательные поля", 400)
 			return
 		}
-
 		_, err := db.Exec(`INSERT INTO social_partners
-			(organization_name, address, contact_person, phone, email, partnership_type)
-			VALUES (?, ?, ?, ?, ?, ?)`,
-			p.OrganizationName, p.Address, p.ContactPerson, p.Phone, p.Email, p.PartnershipType,
+			(organization_name, address, contact_person, phone, email, partnership_type, memo_date)
+			VALUES (?, ?, ?, ?, ?, ?, ?)`,
+			p.OrganizationName, p.Address, p.ContactPerson, p.Phone, p.Email, p.PartnershipType, p.MemoDate,
 		)
 		if err != nil {
 			http.Error(w, "Insert error: "+err.Error(), 500)
 			return
 		}
-
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-
 	tmpl, err := template.ParseFiles("templates/add_partner.html")
 	if err != nil {
 		http.Error(w, "Template error: "+err.Error(), 500)
@@ -159,38 +157,29 @@ func editPartner(w http.ResponseWriter, r *http.Request) {
 			ContactPerson:    r.FormValue("contact_person"),
 			Phone:            r.FormValue("phone"),
 			Email:            r.FormValue("email"),
+			MemoDate:         r.FormValue("memo_date"),
 		}
-
-		if p.OrganizationName == "" || p.PartnershipType == "" {
+		if p.OrganizationName == "" {
 			http.Error(w, "Заполните обязательные поля", 400)
 			return
 		}
-
 		_, err := db.Exec(`UPDATE social_partners SET
-			organization_name=?,
-			address=?,
-			contact_person=?,
-			phone=?,
-			email=?,
-			partnership_type=?
+			organization_name=?, address=?, contact_person=?, phone=?, email=?, partnership_type=?, memo_date=?
 			WHERE id=?`,
-			p.OrganizationName, p.Address, p.ContactPerson, p.Phone, p.Email, p.PartnershipType, p.ID,
+			p.OrganizationName, p.Address, p.ContactPerson, p.Phone, p.Email, p.PartnershipType, p.MemoDate, p.ID,
 		)
 		if err != nil {
 			http.Error(w, "Update error: "+err.Error(), 500)
 			return
 		}
-
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
-	// GET: загрузить данные партнёра
 	var p Partner
-	err = db.QueryRow(`SELECT id, organization_name, address, contact_person, phone, email, partnership_type
+	err = db.QueryRow(`SELECT id, organization_name, address, contact_person, phone, email, partnership_type, COALESCE(memo_date,'')
 		FROM social_partners WHERE id=?`, id).
-		Scan(&p.ID, &p.OrganizationName, &p.Address, &p.ContactPerson, &p.Phone, &p.Email, &p.PartnershipType)
-
+		Scan(&p.ID, &p.OrganizationName, &p.Address, &p.ContactPerson, &p.Phone, &p.Email, &p.PartnershipType, &p.MemoDate)
 	if err == sql.ErrNoRows {
 		http.Error(w, "Партнёр не найден", 404)
 		return
@@ -209,24 +198,20 @@ func editPartner(w http.ResponseWriter, r *http.Request) {
 }
 
 func deletePartner(w http.ResponseWriter, r *http.Request) {
-	// удаление только POST, чтобы случайно не удалить по ссылке
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", 405)
 		return
 	}
-
 	idStr := r.FormValue("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil || id <= 0 {
 		http.Error(w, "Неверный id", 400)
 		return
 	}
-
 	_, err = db.Exec("DELETE FROM social_partners WHERE id=?", id)
 	if err != nil {
 		http.Error(w, "Delete error: "+err.Error(), 500)
 		return
 	}
-
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
