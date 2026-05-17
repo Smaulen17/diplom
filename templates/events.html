@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Іс-шаралар / События</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 13px; background: #f5f5f5; color: #222; }
+
+    .header {
+      background: #1a3a5c;
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header h1 { font-size: 18px; font-weight: bold; }
+    .header a.add-btn {
+      background: #f0a500; color: white; text-decoration: none;
+      padding: 8px 18px; border-radius: 4px; font-weight: bold; font-size: 13px;
+    }
+    .header a.add-btn:hover { background: #d4920a; }
+
+    .nav {
+      background: #14304f;
+      display: flex;
+      gap: 2px;
+      padding: 0 24px;
+    }
+    .nav a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      padding: 10px 18px;
+      font-size: 13px;
+      display: block;
+    }
+    .nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+    .nav a.active { background: #f0a500; color: white; }
+
+    .search-bar {
+      background: #e8eef4; padding: 10px 24px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid #ccc;
+    }
+    .search-bar input {
+      padding: 6px 10px; border: 1px solid #bbb; border-radius: 4px;
+      font-size: 13px; width: 280px;
+    }
+    .search-bar button {
+      padding: 6px 14px; background: #1a3a5c; color: white;
+      border: none; border-radius: 4px; cursor: pointer; font-size: 13px;
+    }
+    .search-bar button:hover { background: #14304f; }
+    .search-bar a { color: #1a3a5c; font-size: 12px; text-decoration: underline; }
+
+    .count { padding: 8px 24px; font-size: 12px; color: #555; background: #f5f5f5; }
+
+    .table-wrap { padding: 0 16px 24px; overflow-x: auto; }
+
+    table {
+      width: 100%; border-collapse: collapse;
+      background: white; margin-top: 8px; border: 1px solid #ccc;
+    }
+    thead tr { background: #1a3a5c; color: white; }
+    thead th {
+      padding: 9px 8px; text-align: center; font-size: 12px;
+      font-weight: bold; border: 1px solid #2a4a6c; white-space: nowrap;
+    }
+    tbody tr:nth-child(odd)  { background: #ffffff; }
+    tbody tr:nth-child(even) { background: #f0f5fb; }
+    tbody tr:hover { background: #ddeeff; }
+    tbody td {
+      padding: 7px 8px; border: 1px solid #d0d8e0;
+      vertical-align: top; font-size: 12px; line-height: 1.4;
+    }
+
+    td.num    { text-align: center; width: 36px; color: #555; }
+    td.date   { text-align: center; white-space: nowrap; width: 100px; }
+    td.time   { text-align: center; white-space: nowrap; width: 70px; }
+    td.actions { text-align: center; white-space: nowrap; width: 140px; }
+
+    .cat-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 10px;
+      font-size: 11px; font-weight: bold; white-space: nowrap;
+    }
+    .cat-оқу       { background: #d0eaff; color: #1a3a5c; }
+    .cat-спорт     { background: #d4f5d4; color: #1a6e1a; }
+    .cat-мәдени    { background: #fff0cc; color: #8a5a00; }
+    .cat-волонтер  { background: #fde0f0; color: #8a0050; }
+    .cat-default   { background: #ececec; color: #444; }
+
+    .btn-edit {
+      display: inline-block; padding: 4px 10px; background: #4a90d9;
+      color: white; text-decoration: none; border-radius: 3px; font-size: 11px; margin-right: 3px;
+    }
+    .btn-edit:hover { background: #2e78c7; }
+    .btn-delete {
+      display: inline-block; padding: 4px 10px; background: #e04040;
+      color: white; border: none; border-radius: 3px; font-size: 11px; cursor: pointer;
+    }
+    .btn-delete:hover { background: #c03030; }
+    .empty { text-align: center; padding: 40px; color: #888; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Колледж портал</h1>
+  <a class="add-btn" href="/events/add">+ Іс-шара қосу</a>
+</div>
+
+<nav class="nav">
+  <a href="/">Социальные партнёры</a>
+  <a href="/events" class="active">Іс-шаралар (События)</a>
+  <a href="/jobs">Вакансиялар (Вакансии)</a>
+</nav>
+
+<form class="search-bar" method="GET" action="/events">
+  <input type="text" name="q" placeholder="Поиск по названию, категории, месту..." value="{{.Query}}">
+  <button type="submit">Найти</button>
+  {{if .Query}}<a href="/events">Сбросить</a>{{end}}
+</form>
+
+<div class="count">
+  Всего событий: {{len .Events}}{{if .Query}} (поиск: «{{.Query}}»){{end}}
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>№</th>
+        <th>Іс-шара атауы / Название</th>
+        <th>Категория</th>
+        <th>Орны / Место</th>
+        <th>Күні / Дата</th>
+        <th>Уақыты / Время</th>
+        <th>Сипаттама / Описание</th>
+        <th>Действия</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{if .Events}}
+        {{range .Events}}
+        <tr>
+          <td class="num">{{.ID}}</td>
+          <td><strong>{{.Title}}</strong></td>
+          <td style="text-align:center">
+            <span class="cat-badge cat-{{.Category}}">{{if .Category}}{{.Category}}{{else}}—{{end}}</span>
+          </td>
+          <td>{{if .Location}}{{.Location}}{{else}}—{{end}}</td>
+          <td class="date">{{if .EventDate}}{{.EventDate}}{{else}}—{{end}}</td>
+          <td class="time">{{if .EventTime}}{{.EventTime}}{{else}}—{{end}}</td>
+          <td>{{if .Description}}{{.Description}}{{else}}—{{end}}</td>
+          <td class="actions">
+            <a class="btn-edit" href="/events/edit?id={{.ID}}">Изменить</a>
+            <form method="POST" action="/events/delete" style="display:inline"
+                  onsubmit="return confirm('Удалить «{{.Title}}»?')">
+              <input type="hidden" name="id" value="{{.ID}}">
+              <button class="btn-delete" type="submit">Удалить</button>
+            </form>
+          </td>
+        </tr>
+        {{end}}
+      {{else}}
+        <tr><td colspan="8" class="empty">Іс-шаралар жоқ / Нет событий</td></tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

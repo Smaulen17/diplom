@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вакансия қосу</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 13px; background: #f5f5f5; color: #222; }
+    .header {
+      background: #1a3a5c; color: white; padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header h1 { font-size: 18px; font-weight: bold; }
+    .header a.back-btn {
+      color: white; text-decoration: none; padding: 7px 16px;
+      border-radius: 4px; font-size: 13px; border: 1px solid rgba(255,255,255,0.5);
+    }
+    .header a.back-btn:hover { background: rgba(255,255,255,0.1); }
+    .nav { background: #14304f; display: flex; gap: 2px; padding: 0 24px; }
+    .nav a { color: rgba(255,255,255,0.7); text-decoration: none; padding: 10px 18px; font-size: 13px; }
+    .nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+    .nav a.active { background: #f0a500; color: white; }
+    .form-wrap {
+      max-width: 680px; margin: 30px auto; background: white;
+      border: 1px solid #ccc; border-top: 3px solid #1a3a5c;
+    }
+    .form-title { background: #1a3a5c; color: white; padding: 10px 20px; font-size: 13px; font-weight: bold; }
+    .form-body { padding: 20px; }
+    .form-row { display: flex; gap: 16px; margin-bottom: 14px; }
+    .form-group { flex: 1; display: flex; flex-direction: column; margin-bottom: 14px; }
+    .form-group.no-mb { margin-bottom: 0; }
+    label { font-size: 12px; font-weight: bold; color: #1a3a5c; margin-bottom: 5px; }
+    label .req { color: #e04040; margin-left: 2px; }
+    input[type="text"], input[type="date"], select, textarea {
+      padding: 7px 10px; border: 1px solid #bbb; border-radius: 3px;
+      font-size: 13px; font-family: Arial, sans-serif; outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #1a3a5c; }
+    textarea { resize: vertical; min-height: 80px; }
+    .form-footer {
+      padding: 14px 20px; background: #f0f5fb;
+      border-top: 1px solid #d0d8e0; display: flex; gap: 10px;
+    }
+    .btn-save {
+      padding: 8px 24px; background: #1a3a5c; color: white;
+      border: none; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer;
+    }
+    .btn-save:hover { background: #14304f; }
+    .btn-cancel {
+      padding: 8px 18px; background: white; color: #555;
+      border: 1px solid #bbb; border-radius: 4px; font-size: 13px; text-decoration: none;
+    }
+    .btn-cancel:hover { background: #f0f0f0; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Колледж портал</h1>
+  <a class="back-btn" href="/jobs">← Назад к вакансиям</a>
+</div>
+
+<nav class="nav">
+  <a href="/">Социальные партнёры</a>
+  <a href="/events">Іс-шаралар (События)</a>
+  <a href="/jobs" class="active">Вакансиялар (Вакансии)</a>
+</nav>
+
+<div class="form-wrap">
+  <div class="form-title">Жаңа вакансия қосу / Добавление новой вакансии</div>
+  <form method="POST" action="/jobs/add">
+    <div class="form-body">
+
+      <div class="form-group">
+        <label>Лауазым / Должность <span class="req">*</span></label>
+        <input type="text" name="title" required placeholder="Бағдарламашы, Дизайнер...">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group no-mb">
+          <label>Компания / Серіктес</label>
+          <input type="text" name="company" placeholder="ТОО «Компания»">
+        </div>
+        <div class="form-group no-mb">
+          <label>Түрі / Тип</label>
+          <select name="job_type">
+            <option value="">— Таңдаңыз —</option>
+            <option value="Жұмыс">💼 Жұмыс (Работа)</option>
+            <option value="Тағылымдама">🎓 Тағылымдама (Стажировка)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Талаптар / Требования</label>
+        <textarea name="requirements" placeholder="Білімі, тәжірибесі, дағдылары..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Сипаттама / Описание</label>
+        <textarea name="description" placeholder="Жұмыс міндеттері туралы қысқаша..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Өтініш мерзімі / Срок подачи заявок</label>
+        <input type="date" name="deadline">
+      </div>
+
+    </div>
+    <div class="form-footer">
+      <button class="btn-save" type="submit">Сақтау / Сохранить</button>
+      <a class="btn-cancel" href="/jobs">Бас тарту / Отмена</a>
+    </div>
+  </form>
+</div>
+
+</body>
+</html>

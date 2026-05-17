@@ -41,6 +41,22 @@
 
     .header a.add-btn:hover { background: #d4920a; }
 
+    .nav {
+      background: #14304f;
+      display: flex;
+      gap: 2px;
+      padding: 0 24px;
+    }
+    .nav a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      padding: 10px 18px;
+      font-size: 13px;
+      display: block;
+    }
+    .nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+    .nav a.active { background: #f0a500; color: white; }
+
     .search-bar {
       background: #e8eef4;
       padding: 10px 24px;
@@ -161,6 +177,12 @@
   <h1>Социальные партнёры</h1>
   <a class="add-btn" href="/add">+ Добавить</a>
 </div>
+
+<nav class="nav">
+  <a href="/" class="active">Социальные партнёры</a>
+  <a href="/events">Іс-шаралар (События)</a>
+  <a href="/jobs">Вакансиялар (Вакансии)</a>
+</nav>
 
 <form class="search-bar" method="GET" action="/">
   <input type="text" name="q" placeholder="Поиск по названию, ФИО, специфике..." value="{{.Query}}">

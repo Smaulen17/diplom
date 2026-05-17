@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Іс-шараны өзгерту</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 13px; background: #f5f5f5; color: #222; }
+
+    .header {
+      background: #1a3a5c; color: white; padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header h1 { font-size: 18px; font-weight: bold; }
+    .header a.back-btn {
+      background: transparent; color: white; text-decoration: none;
+      padding: 7px 16px; border-radius: 4px; font-size: 13px;
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+    .header a.back-btn:hover { background: rgba(255,255,255,0.1); }
+
+    .nav { background: #14304f; display: flex; gap: 2px; padding: 0 24px; }
+    .nav a { color: rgba(255,255,255,0.7); text-decoration: none; padding: 10px 18px; font-size: 13px; }
+    .nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+    .nav a.active { background: #f0a500; color: white; }
+
+    .form-wrap {
+      max-width: 680px; margin: 30px auto; background: white;
+      border: 1px solid #ccc; border-top: 3px solid #1a3a5c;
+    }
+    .form-title {
+      background: #1a3a5c; color: white; padding: 10px 20px;
+      font-size: 13px; font-weight: bold;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .form-title span.id-badge {
+      font-size: 11px; background: rgba(255,255,255,0.15);
+      padding: 2px 8px; border-radius: 10px; font-weight: normal;
+    }
+    .form-body { padding: 20px; }
+    .form-row { display: flex; gap: 16px; margin-bottom: 14px; }
+    .form-group { flex: 1; display: flex; flex-direction: column; margin-bottom: 14px; }
+    .form-group.no-mb { margin-bottom: 0; }
+
+    label { font-size: 12px; font-weight: bold; color: #1a3a5c; margin-bottom: 5px; }
+    label .req { color: #e04040; margin-left: 2px; }
+
+    input[type="text"], input[type="date"], input[type="time"], select, textarea {
+      padding: 7px 10px; border: 1px solid #bbb; border-radius: 3px;
+      font-size: 13px; font-family: Arial, sans-serif; outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #1a3a5c; }
+    textarea { resize: vertical; min-height: 80px; }
+
+    .form-footer {
+      padding: 14px 20px; background: #f0f5fb;
+      border-top: 1px solid #d0d8e0; display: flex; gap: 10px;
+    }
+    .btn-save {
+      padding: 8px 24px; background: #f0a500; color: white;
+      border: none; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer;
+    }
+    .btn-save:hover { background: #d4920a; }
+    .btn-cancel {
+      padding: 8px 18px; background: white; color: #555;
+      border: 1px solid #bbb; border-radius: 4px; font-size: 13px; text-decoration: none;
+    }
+    .btn-cancel:hover { background: #f0f0f0; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Колледж портал</h1>
+  <a class="back-btn" href="/events">← Назад к событиям</a>
+</div>
+
+<nav class="nav">
+  <a href="/">Социальные партнёры</a>
+  <a href="/events" class="active">Іс-шаралар (События)</a>
+</nav>
+
+<div class="form-wrap">
+  <div class="form-title">
+    Іс-шараны өзгерту / Редактирование события
+    <span class="id-badge">ID: {{.ID}}</span>
+  </div>
+
+  <form method="POST" action="/events/edit?id={{.ID}}">
+    <div class="form-body">
+
+      <div class="form-group">
+        <label>Іс-шара атауы / Название <span class="req">*</span></label>
+        <input type="text" name="title" required value="{{.Title}}">
+      </div>
+
+      <div class="form-group">
+        <label>Категория</label>
+        <select name="category">
+          <option value="">— Таңдаңыз / Выберите —</option>
+          <option value="оқу"    {{if eq .Category "оқу"}}selected{{end}}>📚 Оқу (Учебное)</option>
+          <option value="спорт"  {{if eq .Category "спорт"}}selected{{end}}>⚽ Спорт</option>
+          <option value="мәдени" {{if eq .Category "мәдени"}}selected{{end}}>🎭 Мәдени (Культурное)</option>
+          <option value="волонтер" {{if eq .Category "волонтер"}}selected{{end}}>🤝 Волонтерлік</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Орны / Место проведения</label>
+        <input type="text" name="location" value="{{.Location}}">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group no-mb">
+          <label>Күні / Дата</label>
+          <input type="date" name="event_date" value="{{.EventDate}}">
+        </div>
+        <div class="form-group no-mb">
+          <label>Уақыты / Время</label>
+          <input type="time" name="event_time" value="{{.EventTime}}">
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:14px;">
+        <label>Сипаттама / Описание</label>
+        <textarea name="description">{{.Description}}</textarea>
+      </div>
+
+    </div>
+
+    <div class="form-footer">
+      <button class="btn-save" type="submit">Өзгерістерді сақтау / Сохранить</button>
+      <a class="btn-cancel" href="/events">Бас тарту / Отмена</a>
+    </div>
+  </form>
+</div>
+
+</body>
+</html>
